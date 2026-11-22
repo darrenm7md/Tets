@@ -682,7 +682,7 @@ function Library.CreateLib(title, theme)
         end
         
         -------------------------------------------
-        -- ColorPicker (simplified — HSV hue bar + sat/val square)
+        -- ColorPicker (Fixed: Removed invalid Text property)
         -------------------------------------------
         function TabAPI:NewColorPicker(name, _info, defaultColor, callback)
             callback = callback or function() end
@@ -719,7 +719,6 @@ function Library.CreateLib(title, theme)
                 Position = UDim2.new(1, -47, 0, 5),
                 Size = UDim2.new(0, 40, 0, 22),
                 AutoButtonColor = false,
-                Text = "",
             })
             create("UICorner", { Parent = Swatch, CornerRadius = UDim.new(0, 3) })
             
