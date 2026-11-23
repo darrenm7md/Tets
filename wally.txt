@@ -1,7 +1,4 @@
--- wally v3 bitches
--- credits to azixio for deobfuscating // @azixio.txt
--- made by susmic // @_susmic
--- 
+-- wally v3
 local Library = {}
 
 -- services
@@ -15,7 +12,7 @@ local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
--- global theme (matches the "Maxx" preset from original)
+-- global theme
 local Theme = {
     Main       = Color3.fromRGB(20, 20, 20),
     Secondary  = Color3.fromRGB(26, 26, 26),
@@ -28,12 +25,6 @@ local Theme = {
     ButtonText = Color3.fromRGB(0, 0, 0),
     Arrow      = Color3.fromRGB(96, 96, 96),
 }
-
--- preset override
-if getgenv and getgenv().Preset == "Maxx" then
-    local c = Color3.fromRGB(255, 184, 0)
-    Theme.Button, Theme.Toggle, Theme.Slider = c, c, c
-end
 
 -- helpers
 local function create(class, props)
@@ -74,7 +65,7 @@ local function makeDraggable(frame, dragHandle)
 end
 
 local function roundSlice(obj)
-    obj.ScaleType = Enum.ScaleType.ScaleType or Enum.ScaleType.Slice
+    obj.ScaleType = Enum.ScaleType.Slice
     obj.SliceCenter = Rect.new(128, 128, 128, 128)
     obj.SliceScale = 0.05
 end
@@ -223,8 +214,8 @@ function Library.CreateLib(title, theme)
             Parent = TabHeader,
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
-            Position = UDim2.new(0, 0, 1, 0),
-            Size = UDim2.new(1, 0, 1, 0),
+            Position = UDim2.new(0, 0, 0, 35),
+            Size = UDim2.new(1, 0, 0, 0),
             CanvasSize = UDim2.new(0, 0, 0, 0),
             ScrollBarThickness = 2,
         })
@@ -250,8 +241,8 @@ function Library.CreateLib(title, theme)
         local open = false
         HeaderButton.MouseButton1Click:Connect(function()
             open = not open
-            local contentHeight = ContentLayout.AbsoluteContentSize.Y + 45
-            if contentHeight < 45 then contentHeight = 200 end -- fallback height if layout isn't measured yet
+            local contentHeight = ContentLayout.AbsoluteContentSize.Y + 10
+            if contentHeight < 45 then contentHeight = 220 end
             
             if open then
                 local target = contentHeight + 35
@@ -262,7 +253,7 @@ function Library.CreateLib(title, theme)
             else
                 tween(TabFrame, 0.2, { Size = UDim2.new(0, 180, 0, 35) })
                 tween(TabHeader, 0.2, { Size = UDim2.new(0, 180, 0, 35) })
-                tween(TabContent, 0.2, { Size = UDim2.new(1, 0, 0, 0)) })
+                tween(TabContent, 0.2, { Size = UDim2.new(1, 0, 0, 0) })
                 tween(TabArrow, 0.3, { Rotation = 0 })
             end
         end)
