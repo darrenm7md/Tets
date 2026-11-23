@@ -1,4 +1,4 @@
--- wally v3 standard layout
+-- wally v3 fixed
 local Library = {}
 
 local TweenService = game:GetService("TweenService")
@@ -132,7 +132,7 @@ function Library.CreateLib(title, theme)
         Font = Enum.Font.SourceSansBold,
         Text = title,
         TextColor3 = Theme.MainText,
-        TextSize, 16,
+        TextSize = 16,
         TextXAlignment = Enum.TextXAlignment.Left,
     })
     
