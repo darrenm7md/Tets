@@ -1,7 +1,6 @@
--- wally v3
+-- wally v3 standard layout
 local Library = {}
 
--- services
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -12,21 +11,19 @@ local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
--- global theme
 local Theme = {
     Main       = Color3.fromRGB(20, 20, 20),
     Secondary  = Color3.fromRGB(26, 26, 26),
     Tertiary   = Color3.fromRGB(38, 38, 38),
-    Button     = Color3.fromRGB(255, 184, 0),
-    Toggle     = Color3.fromRGB(255, 184, 0),
-    Slider     = Color3.fromRGB(255, 184, 0),
+    Button     = Color3.fromRGB(0, 220, 80),
+    Toggle     = Color3.fromRGB(0, 220, 80),
+    Slider     = Color3.fromRGB(0, 220, 80),
     Text       = Color3.fromRGB(170, 170, 170),
     MainText   = Color3.fromRGB(255, 255, 255),
-    ButtonText = Color3.fromRGB(0, 0, 0),
+    ButtonText = Color3.fromRGB(255, 255, 255),
     Arrow      = Color3.fromRGB(96, 96, 96),
 }
 
--- helpers
 local function create(class, props)
     local inst = Instance.new(class)
     for k, v in pairs(props or {}) do
@@ -109,13 +106,13 @@ function Library.CreateLib(title, theme)
         Parent = gui,
         BackgroundTransparency = 1,
         Position = UDim2.new(0, 15 + WindowOffset, 0, 15),
-        Size = UDim2.new(0, 180, 0, 35),
+        Size = UDim2.new(0, 190, 0, 32),
         Image = "rbxassetid://4921672704",
         ImageColor3 = Theme.Main,
         ClipsDescendants = false,
     })
     roundSlice(Window)
-    WindowOffset = WindowOffset + 200
+    WindowOffset = WindowOffset + 210
     
     create("Frame", {
         Name = "HideRounding",
@@ -130,11 +127,12 @@ function Library.CreateLib(title, theme)
         Name = "Title",
         Parent = Window,
         BackgroundTransparency = 1,
+        Position = UDim2.new(0, 8, 0, 0),
         Size = UDim2.new(0.85, 0, 1, 0),
         Font = Enum.Font.SourceSansBold,
-        Text = "  " .. title,
+        Text = title,
         TextColor3 = Theme.MainText,
-        TextSize = 18,
+        TextSize, 16,
         TextXAlignment = Enum.TextXAlignment.Left,
     })
     
@@ -142,7 +140,7 @@ function Library.CreateLib(title, theme)
         Name = "Arrow",
         Parent = Window,
         BackgroundTransparency = 1,
-        Position = UDim2.new(1, -20, 0, 10),
+        Position = UDim2.new(1, -22, 0, 10),
         Size = UDim2.new(0, 12, 0, 12),
         Image = "rbxassetid://4921527706",
         ImageColor3 = Theme.Arrow,
@@ -172,14 +170,14 @@ function Library.CreateLib(title, theme)
             Parent = Tabs,
             BackgroundTransparency = 1,
             ClipsDescendants = false,
-            Size = UDim2.new(0, 180, 0, 35),
+            Size = UDim2.new(0, 190, 0, 32),
         })
         
         local TabHeader = create("ImageLabel", {
             Name = "FolderHeader",
             Parent = TabFrame,
             BackgroundTransparency = 1,
-            Size = UDim2.new(0, 180, 0, 35),
+            Size = UDim2.new(0, 190, 0, 32),
             Image = "rbxassetid://4641600283",
             ImageColor3 = Theme.Secondary,
             ClipsDescendants = false,
@@ -195,7 +193,7 @@ function Library.CreateLib(title, theme)
             Font = Enum.Font.SourceSansBold,
             Text = tabName,
             TextColor3 = Theme.MainText,
-            TextSize = 18,
+            TextSize = 16,
             TextXAlignment = Enum.TextXAlignment.Left,
         })
         
@@ -203,7 +201,7 @@ function Library.CreateLib(title, theme)
             Name = "Arrow",
             Parent = TabHeader,
             BackgroundTransparency = 1,
-            Position = UDim2.new(1, -20, 0, 10),
+            Position = UDim2.new(1, -22, 0, 10),
             Size = UDim2.new(0, 12, 0, 12),
             Image = "rbxassetid://4921527706",
             ImageColor3 = Theme.Arrow,
@@ -215,7 +213,7 @@ function Library.CreateLib(title, theme)
             Parent = TabHeader,
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
-            Position = UDim2.new(0, 0, 0, 35),
+            Position = UDim2.new(0, 0, 0, 32),
             Size = UDim2.new(1, 0, 0, 0),
             CanvasSize = UDim2.new(0, 0, 0, 0),
             ScrollBarThickness = 2,
@@ -224,18 +222,18 @@ function Library.CreateLib(title, theme)
         local ContentLayout = create("UIListLayout", {
             Parent = TabContent,
             SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDim.new(0, 5),
+            Padding = UDim.new(0, 3),
         })
-        create("UIPadding", { Parent = TabContent, PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 5) })
+        create("UIPadding", { Parent = TabContent, PaddingTop = UDim.new(0, 4), PaddingBottom = UDim.new(0, 4), PaddingLeft = UDim.new(0, 4), PaddingRight = UDim.new(0, 4) })
 
         ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            TabContent.CanvasSize = UDim2.new(0, 0, 0, ContentLayout.AbsoluteContentSize.Y + 15)
+            TabContent.CanvasSize = UDim2.new(0, 0, 0, ContentLayout.AbsoluteContentSize.Y + 10)
         end)
         
         local HeaderButton = create("TextButton", {
             Parent = TabHeader,
             BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 35),
+            Size = UDim2.new(1, 0, 0, 32),
             Text = "",
             ZIndex = 2,
         })
@@ -243,18 +241,18 @@ function Library.CreateLib(title, theme)
         local open = false
         HeaderButton.MouseButton1Click:Connect(function()
             open = not open
-            local contentHeight = ContentLayout.AbsoluteContentSize.Y + 20
-            if contentHeight < 45 then contentHeight = 240 end
+            local contentHeight = ContentLayout.AbsoluteContentSize.Y + 15
+            if contentHeight < 40 then contentHeight = 220 end
             
             if open then
-                local target = contentHeight + 35
-                tween(TabFrame, 0.2, { Size = UDim2.new(0, 180, 0, target) })
-                tween(TabHeader, 0.2, { Size = UDim2.new(0, 180, 0, target) })
+                local target = contentHeight + 32
+                tween(TabFrame, 0.2, { Size = UDim2.new(0, 190, 0, target) })
+                tween(TabHeader, 0.2, { Size = UDim2.new(0, 190, 0, target) })
                 tween(TabContent, 0.2, { Size = UDim2.new(1, 0, 0, contentHeight) })
                 tween(TabArrow, 0.3, { Rotation = -90 })
             else
-                tween(TabFrame, 0.2, { Size = UDim2.new(0, 180, 0, 35) })
-                tween(TabHeader, 0.2, { Size = UDim2.new(0, 180, 0, 35) })
+                tween(TabFrame, 0.2, { Size = UDim2.new(0, 190, 0, 32) })
+                tween(TabHeader, 0.2, { Size = UDim2.new(0, 190, 0, 32) })
                 tween(TabContent, 0.2, { Size = UDim2.new(1, 0, 0, 0) })
                 tween(TabArrow, 0.3, { Rotation = 0 })
             end
@@ -268,7 +266,7 @@ function Library.CreateLib(title, theme)
                 Name = "Button",
                 Parent = TabContent,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -6, 0, 32),
+                Size = UDim2.new(1, 0, 0, 30),
                 Image = "rbxassetid://4641600283",
                 ImageColor3 = Theme.Tertiary,
                 LayoutOrder = 1,
@@ -281,7 +279,7 @@ function Library.CreateLib(title, theme)
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0.5, 0, 0.5, 0),
-                Size = UDim2.new(0.9, 0, 0.7, 0),
+                Size = UDim2.new(0.95, 0, 0.75, 0),
                 Image = "rbxassetid://4921672704",
                 ImageColor3 = Theme.Button,
                 AutoButtonColor = false,
@@ -295,13 +293,13 @@ function Library.CreateLib(title, theme)
                 Font = Enum.Font.SourceSansBold,
                 Text = name,
                 TextColor3 = Theme.ButtonText,
-                TextSize = 16,
+                TextSize = 14,
             })
             
             Click.MouseButton1Click:Connect(function()
-                tween(Click, 0.08, { Size = UDim2.new(0.85, 0, 0.6, 0) })
+                tween(Click, 0.08, { Size = UDim2.new(0.9, 0, 0.65, 0) })
                 task.wait(0.08)
-                tween(Click, 0.1, { Size = UDim2.new(0.9, 0, 0.7, 0) })
+                tween(Click, 0.1, { Size = UDim2.new(0.95, 0, 0.75, 0) })
                 pcall(callback)
             end)
             return Btn
@@ -313,7 +311,7 @@ function Library.CreateLib(title, theme)
                 Name = "Toggle",
                 Parent = TabContent,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -6, 0, 32),
+                Size = UDim2.new(1, 0, 0, 30),
                 Image = "rbxassetid://4641600283",
                 ImageColor3 = Theme.Tertiary,
                 LayoutOrder = 1,
@@ -323,12 +321,12 @@ function Library.CreateLib(title, theme)
             create("TextLabel", {
                 Parent = Tgl,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 7, 0, 0),
-                Size = UDim2.new(1, -40, 1, 0),
+                Position = UDim2.new(0, 8, 0, 0),
+                Size = UDim2.new(1, -38, 1, 0),
                 Font = Enum.Font.SourceSansSemibold,
                 Text = name,
                 TextColor3 = Theme.Text,
-                TextSize = 16,
+                TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
             })
             
@@ -336,7 +334,7 @@ function Library.CreateLib(title, theme)
                 Name = "Tick",
                 Parent = Tgl,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(1, -26, 0, 7),
+                Position = UDim2.new(1, -26, 0, 6),
                 Size = UDim2.new(0, 18, 0, 18),
                 Image = "rbxassetid://4608020054",
                 ImageColor3 = Color3.fromRGB(94, 93, 94),
@@ -380,7 +378,7 @@ function Library.CreateLib(title, theme)
                 Name = "Slider",
                 Parent = TabContent,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -6, 0, 40),
+                Size = UDim2.new(1, 0, 0, 38),
                 Image = "rbxassetid://4641600283",
                 ImageColor3 = Theme.Tertiary,
                 LayoutOrder = 1,
@@ -390,35 +388,35 @@ function Library.CreateLib(title, theme)
             create("TextLabel", {
                 Parent = Sld,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 7, 0.1, 0),
-                Size = UDim2.new(0, 125, 0, 20),
+                Position = UDim2.new(0, 8, 0, 2),
+                Size = UDim2.new(0, 110, 0, 18),
                 Font = Enum.Font.SourceSansSemibold,
                 Text = name,
                 TextColor3 = Theme.Text,
-                TextSize = 16,
+                TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
             })
             
             local ValBox = create("TextBox", {
                 Parent = Sld,
-                AnchorPoint = Vector2.new(1, 0.5),
+                AnchorPoint = Vector2.new(1, 0),
                 BackgroundColor3 = Color3.fromRGB(65, 65, 65),
                 BorderSizePixel = 0,
-                Position = UDim2.new(0.96, 0, 0.3, 0),
+                Position = UDim2.new(1, -8, 0, 2),
                 Size = UDim2.new(0, 32, 0, 16),
                 Font = Enum.Font.SourceSansSemibold,
                 Text = tostring(min),
                 TextColor3 = Theme.Text,
-                TextSize = 12,
+                TextSize = 11,
             })
             create("UICorner", { Parent = ValBox, CornerRadius = UDim.new(0, 3) })
             
             local Track = create("ImageLabel", {
                 Parent = Sld,
-                AnchorPoint = Vector2.new(0.5, 0.5),
+                AnchorPoint = Vector2.new(0.5, 0),
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0.5, 0, 0.8, 0),
-                Size = UDim2.new(1, -14, 0, 4),
+                Position = UDim2.new(0.5, 0, 0, 26),
+                Size = UDim2.new(1, -16, 0, 4),
                 Image = "rbxassetid://4608020054",
                 ImageColor3 = Color3.fromRGB(46, 46, 46),
             })
@@ -479,7 +477,7 @@ function Library.CreateLib(title, theme)
                 Name = "Bind",
                 Parent = TabContent,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -6, 0, 35),
+                Size = UDim2.new(1, 0, 0, 30),
                 Image = "rbxassetid://4641600283",
                 ImageColor3 = Theme.Tertiary,
                 LayoutOrder = 1,
@@ -489,12 +487,12 @@ function Library.CreateLib(title, theme)
             create("TextLabel", {
                 Parent = Bnd,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 7, 0, 2),
-                Size = UDim2.new(0, 125, 0, 30),
+                Position = UDim2.new(0, 8, 0, 0),
+                Size = UDim2.new(0, 110, 1, 0),
                 Font = Enum.Font.SourceSansSemibold,
                 Text = name,
                 TextColor3 = Theme.Text,
-                TextSize = 16,
+                TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
             })
             
@@ -502,12 +500,12 @@ function Library.CreateLib(title, theme)
                 Parent = Bnd,
                 BackgroundColor3 = Color3.fromRGB(65, 65, 65),
                 BorderSizePixel = 0,
-                Position = UDim2.new(1, -47, 0, 7),
-                Size = UDim2.new(0, 40, 0, 21),
+                Position = UDim2.new(1, -44, 0, 4),
+                Size = UDim2.new(0, 36, 0, 22),
                 Font = Enum.Font.SourceSansSemibold,
                 Text = KeyDisplay[currentKey.Name] or currentKey.Name,
                 TextColor3 = Theme.Text,
-                TextSize = 12,
+                TextSize = 11,
             })
             create("UICorner", { Parent = KeyBtn, CornerRadius = UDim.new(0, 3) })
             
@@ -532,7 +530,7 @@ function Library.CreateLib(title, theme)
                 Name = "Dropdown",
                 Parent = TabContent,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -6, 0, 32),
+                Size = UDim2.new(1, 0, 0, 30),
                 Image = "rbxassetid://4641600283",
                 ImageColor3 = Theme.Tertiary,
                 ClipsDescendants = false,
@@ -544,11 +542,11 @@ function Library.CreateLib(title, theme)
             local DropHeader = create("TextButton", {
                 Parent = Drop,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, 0, 0, 32),
+                Size = UDim2.new(1, 0, 0, 30),
                 Font = Enum.Font.SourceSansSemibold,
                 Text = "  " .. name,
                 TextColor3 = Theme.Text,
-                TextSize = 16,
+                TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 ZIndex = 6,
             })
@@ -557,7 +555,7 @@ function Library.CreateLib(title, theme)
                 Parent = Drop,
                 AnchorPoint = Vector2.new(0, 0.5),
                 BackgroundTransparency = 1,
-                Position = UDim2.new(1, -20, 0, 16),
+                Position = UDim2.new(1, -22, 0, 15),
                 Size = UDim2.new(0, 12, 0, 12),
                 Image = "rbxassetid://4921527706",
                 ImageColor3 = Theme.Arrow,
@@ -569,7 +567,7 @@ function Library.CreateLib(title, theme)
                 Parent = Drop,
                 BackgroundColor3 = Color3.fromRGB(35, 35, 35),
                 BorderSizePixel = 0,
-                Position = UDim2.new(0, 0, 0, 32),
+                Position = UDim2.new(0, 0, 0, 30),
                 Size = UDim2.new(1, 0, 0, 0),
                 ClipsDescendants = true,
                 ZIndex = 10,
@@ -585,18 +583,17 @@ function Library.CreateLib(title, theme)
                         Parent = List,
                         BackgroundColor3 = Color3.fromRGB(50, 50, 50),
                         BorderSizePixel = 0,
-                        Size = UDim2.new(1, 0, 0, 24),
+                        Size = UDim2.new(1, 0, 0, 22),
                         Font = Enum.Font.SourceSans,
                         Text = tostring(opt),
                         TextColor3 = Theme.Text,
-                        TextSize = 14,
+                        TextSize = 13,
                         ZIndex = 11,
                         LayoutOrder = i,
                     })
                     Item.MouseButton1Click:Connect(function()
                         DropHeader.Text = "  " .. tostring(opt)
                         pcall(callback, opt)
-                        -- close dropdown on selection
                         tween(List, 0.15, { Size = UDim2.new(1, 0, 0, 0) })
                         tween(DropArrow, 0.15, { Rotation = 0 })
                     end)
@@ -608,7 +605,7 @@ function Library.CreateLib(title, theme)
             DropHeader.MouseButton1Click:Connect(function()
                 dropOpen = not dropOpen
                 if dropOpen then
-                    local h = #options * 24
+                    local h = #options * 22
                     tween(List, 0.2, { Size = UDim2.new(1, 0, 0, h) })
                     tween(DropArrow, 0.2, { Rotation = -90 })
                 else
@@ -626,7 +623,7 @@ function Library.CreateLib(title, theme)
                 Name = "Box",
                 Parent = TabContent,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -6, 0, 33),
+                Size = UDim2.new(1, 0, 0, 30),
                 Image = "rbxassetid://4641600283",
                 ImageColor3 = Theme.Tertiary,
                 LayoutOrder = 1,
@@ -636,12 +633,12 @@ function Library.CreateLib(title, theme)
             create("TextLabel", {
                 Parent = Box,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 7, 0, 2),
-                Size = UDim2.new(0, 100, 0, 30),
+                Position = UDim2.new(0, 8, 0, 0),
+                Size = UDim2.new(0, 100, 1, 0),
                 Font = Enum.Font.SourceSansSemibold,
                 Text = name,
                 TextColor3 = Theme.Text,
-                TextSize = 16,
+                TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
             })
             
@@ -649,8 +646,8 @@ function Library.CreateLib(title, theme)
                 Parent = Box,
                 BackgroundColor3 = Color3.fromRGB(50, 50, 50),
                 BorderSizePixel = 0,
-                Position = UDim2.new(1, -50, 0, 6),
-                Size = UDim2.new(0, 45, 0, 21),
+                Position = UDim2.new(1, -52, 0, 4),
+                Size = UDim2.new(0, 44, 0, 22),
                 Font = Enum.Font.SourceSansBold,
                 PlaceholderText = "...",
                 Text = "",
@@ -671,7 +668,7 @@ function Library.CreateLib(title, theme)
                 Name = "Label",
                 Parent = TabContent,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -6, 0, 32),
+                Size = UDim2.new(1, 0, 0, 30),
                 Image = "rbxassetid://4641600283",
                 ImageColor3 = Theme.Tertiary,
                 LayoutOrder = 1,
@@ -685,7 +682,7 @@ function Library.CreateLib(title, theme)
                 Font = Enum.Font.SourceSansSemibold,
                 Text = text,
                 TextColor3 = Theme.MainText,
-                TextSize = 16,
+                TextSize = 14,
             })
             
             return Lbl
