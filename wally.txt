@@ -35,18 +35,6 @@ if getgenv and getgenv().Preset == "Maxx" then
     Theme.Button, Theme.Toggle, Theme.Slider = c, c, c
 end
 
--- shared rainbow state
-local RainbowState = { i = 0, color = Color3.fromRGB(255, 0, 0) }
-task.spawn(function()
-    while true do
-        for h = 0, 359 do
-            RainbowState.i = h / 359
-            RainbowState.color = Color3.fromHSV(h / 359, 1, 1)
-            task.wait(0.03)
-        end
-    end
-end)
-
 -- helpers
 local function create(class, props)
     local inst = Instance.new(class)
@@ -86,12 +74,11 @@ local function makeDraggable(frame, dragHandle)
 end
 
 local function roundSlice(obj)
-    obj.ScaleType = Enum.ScaleType.Slice
+    obj.ScaleType = Enum.ScaleType.ScaleType or Enum.ScaleType.Slice
     obj.SliceCenter = Rect.new(128, 128, 128, 128)
     obj.SliceScale = 0.05
 end
 
--- key display map
 local KeyDisplay = {
     RightControl = "RCtrl", LeftControl = "LCtrl",
     LeftShift = "LShift", RightShift = "RShift",
@@ -100,16 +87,11 @@ local KeyDisplay = {
     Space = "Space", Return = "Enter",
 }
 
--- window counter (so multiple windows stack)
 local WindowOffset = 0
 
--------------------------------------------------
--- CreateLib
--------------------------------------------------
 function Library.CreateLib(title, theme)
     title = title or "UI"
     
-    -- destroy old copies
     for _, v in pairs(CoreGui:GetChildren()) do
         if v:IsA("ScreenGui") and v:FindFirstChild("KavoRebornTag") then
             v:Destroy()
@@ -124,7 +106,6 @@ function Library.CreateLib(title, theme)
     })
     create("IntValue", { Name = "KavoRebornTag", Parent = gui })
     
-    -- toggle visibility with RightCtrl
     UserInputService.InputBegan:Connect(function(input, gpe)
         if gpe then return end
         if input.KeyCode == Enum.KeyCode.RightControl then
@@ -132,7 +113,6 @@ function Library.CreateLib(title, theme)
         end
     end)
     
-    -- main window frame
     local Window = create("ImageLabel", {
         Name = "Window",
         Parent = gui,
@@ -146,7 +126,6 @@ function Library.CreateLib(title, theme)
     roundSlice(Window)
     WindowOffset = WindowOffset + 200
     
-    -- cap at bottom (hides rounding when tabs are open)
     create("Frame", {
         Name = "HideRounding",
         Parent = Window,
@@ -156,8 +135,7 @@ function Library.CreateLib(title, theme)
         Size = UDim2.new(1, 0, 0, 5),
     })
     
-    -- title
-    local TitleLabel = create("TextLabel", {
+    create("TextLabel", {
         Name = "Title",
         Parent = Window,
         BackgroundTransparency = 1,
@@ -169,8 +147,7 @@ function Library.CreateLib(title, theme)
         TextXAlignment = Enum.TextXAlignment.Left,
     })
     
-    -- arrow (close/open indicator)
-    local Arrow = create("ImageLabel", {
+    create("ImageLabel", {
         Name = "Arrow",
         Parent = Window,
         BackgroundTransparency = 1,
@@ -180,7 +157,6 @@ function Library.CreateLib(title, theme)
         ImageColor3 = Theme.Arrow,
     })
     
-    -- tabs container
     local Tabs = create("Frame", {
         Name = "Sections",
         Parent = Window,
@@ -197,9 +173,6 @@ function Library.CreateLib(title, theme)
     
     local WindowAPI = {}
     
-    ---------------------------------------------
-    -- NewTab
-    ---------------------------------------------
     function WindowAPI:NewTab(tabName)
         tabName = tabName or "Tab"
         
@@ -221,7 +194,7 @@ function Library.CreateLib(title, theme)
         })
         roundSlice(TabHeader)
         
-        local TabTitle = create("TextLabel", {
+        create("TextLabel", {
             Name = "Title",
             Parent = TabHeader,
             BackgroundTransparency = 1,
@@ -245,12 +218,15 @@ function Library.CreateLib(title, theme)
             Rotation = 0,
         })
         
-        local TabContent = create("Frame", {
+        local TabContent = create("ScrollingFrame", {
             Name = "Content",
             Parent = TabHeader,
             BackgroundTransparency = 1,
+            BorderSizePixel = 0,
             Position = UDim2.new(0, 0, 1, 0),
-            Size = UDim2.new(1, 0, 0, 0),
+            Size = UDim2.new(1, 0, 1, 0),
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            ScrollBarThickness = 2,
         })
         local ContentLayout = create("UIListLayout", {
             Parent = TabContent,
@@ -258,6 +234,10 @@ function Library.CreateLib(title, theme)
             Padding = UDim.new(0, 3),
         })
         create("UIPadding", { Parent = TabContent, PaddingTop = UDim.new(0, 3) })
+
+        ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            TabContent.CanvasSize = UDim2.new(0, 0, 0, ContentLayout.AbsoluteContentSize.Y + 10)
+        end)
         
         local HeaderButton = create("TextButton", {
             Parent = TabHeader,
@@ -267,27 +247,28 @@ function Library.CreateLib(title, theme)
             ZIndex = 2,
         })
         
-        -- collapse state
         local open = false
         HeaderButton.MouseButton1Click:Connect(function()
             open = not open
+            local contentHeight = ContentLayout.AbsoluteContentSize.Y + 45
+            if contentHeight < 45 then contentHeight = 200 end -- fallback height if layout isn't measured yet
+            
             if open then
-                local target = ContentLayout.AbsoluteContentSize.Y + 42
+                local target = contentHeight + 35
                 tween(TabFrame, 0.2, { Size = UDim2.new(0, 180, 0, target) })
                 tween(TabHeader, 0.2, { Size = UDim2.new(0, 180, 0, target) })
+                tween(TabContent, 0.2, { Size = UDim2.new(1, 0, 0, contentHeight) })
                 tween(TabArrow, 0.3, { Rotation = -90 })
             else
                 tween(TabFrame, 0.2, { Size = UDim2.new(0, 180, 0, 35) })
                 tween(TabHeader, 0.2, { Size = UDim2.new(0, 180, 0, 35) })
+                tween(TabContent, 0.2, { Size = UDim2.new(1, 0, 0, 0)) })
                 tween(TabArrow, 0.3, { Rotation = 0 })
             end
         end)
         
         local TabAPI = {}
         
-        -------------------------------------------
-        -- Button
-        -------------------------------------------
         function TabAPI:NewButton(name, _info, callback)
             callback = callback or function() end
             local Btn = create("ImageLabel", {
@@ -333,9 +314,6 @@ function Library.CreateLib(title, theme)
             return Btn
         end
         
-        -------------------------------------------
-        -- Toggle
-        -------------------------------------------
         function TabAPI:NewToggle(name, _info, callback)
             callback = callback or function() end
             local Tgl = create("ImageLabel", {
@@ -397,25 +375,9 @@ function Library.CreateLib(title, theme)
                 pcall(callback, state)
             end)
             
-            return {
-                UpdateToggle = function(_, _, newState)
-                    state = newState
-                    if state then
-                        Tick.ImageColor3 = Theme.Toggle
-                        Fill.Size = UDim2.new(0, 0, 0, 0)
-                        Fill.Position = UDim2.new(0.5, 0, 0.5, 0)
-                    else
-                        Tick.ImageColor3 = Color3.fromRGB(94, 93, 94)
-                        Fill.Size = UDim2.new(1, -4, 1, -4)
-                        Fill.Position = UDim2.new(0, 2, 0, 2)
-                    end
-                end,
-            }
+            return Tgl
         end
         
-        -------------------------------------------
-        -- Slider
-        -------------------------------------------
         function TabAPI:NewSlider(name, _info, max, min, callback)
             callback = callback or function() end
             max = max or 100
@@ -512,23 +474,9 @@ function Library.CreateLib(title, theme)
                 end
             end)
             
-            ValBox.FocusLost:Connect(function()
-                local n = tonumber(ValBox.Text)
-                if n and n >= min and n <= max then
-                    local rel = (n - min) / (max - min)
-                    Indicator.Size = UDim2.new(rel, 0, 1, 0)
-                    pcall(callback, n)
-                else
-                    ValBox.Text = "Min " .. min .. ", Max " .. max
-                end
-            end)
-            
             return Sld
         end
         
-        -------------------------------------------
-        -- Keybind
-        -------------------------------------------
         function TabAPI:NewKeybind(name, _info, defaultKey, callback)
             callback = callback or function() end
             local binding = false
@@ -580,19 +528,9 @@ function Library.CreateLib(title, theme)
                 binding = false
             end)
             
-            UserInputService.InputBegan:Connect(function(input, gpe)
-                if gpe or binding then return end
-                if input.KeyCode == currentKey then
-                    pcall(callback)
-                end
-            end)
-            
             return Bnd
         end
         
-        -------------------------------------------
-        -- Dropdown
-        -------------------------------------------
         function TabAPI:NewDropdown(name, _info, options, callback)
             callback = callback or function() end
             options = options or {}
@@ -637,7 +575,7 @@ function Library.CreateLib(title, theme)
                 Position = UDim2.new(0, 0, 0, 32),
                 Size = UDim2.new(1, 0, 0, 0),
             })
-            local ListLayout = create("UIListLayout", { Parent = List, SortOrder = Enum.SortOrder.LayoutOrder })
+            create("UIListLayout", { Parent = List, SortOrder = Enum.SortOrder.LayoutOrder })
             
             local function rebuild(opts)
                 for _, c in ipairs(List:GetChildren()) do
@@ -663,10 +601,10 @@ function Library.CreateLib(title, theme)
             end
             rebuild(options)
             
-            local open = false
+            local dropOpen = false
             DropHeader.MouseButton1Click:Connect(function()
-                open = not open
-                if open then
+                dropOpen = not dropOpen
+                if dropOpen then
                     local h = #options * 22 + 34
                     tween(Drop, 0.2, { Size = UDim2.new(1, -6, 0, h) })
                     tween(DropArrow, 0.2, { Rotation = -90 })
@@ -676,146 +614,9 @@ function Library.CreateLib(title, theme)
                 end
             end)
             
-            return {
-                Refresh = function(_, newOpts) rebuild(newOpts) end,
-            }
+            return Drop
         end
         
-        -------------------------------------------
-        -- ColorPicker (Fixed: Removed invalid Text property)
-        -------------------------------------------
-        function TabAPI:NewColorPicker(name, _info, defaultColor, callback)
-            callback = callback or function() end
-            defaultColor = defaultColor or Color3.fromRGB(255, 0, 255)
-            
-            local Pick = create("ImageLabel", {
-                Name = "ColorPicker",
-                Parent = TabContent,
-                BackgroundTransparency = 1,
-                Size = UDim2.new(1, -6, 0, 32),
-                Image = "rbxassetid://4641600283",
-                ImageColor3 = Theme.Tertiary,
-                LayoutOrder = 1,
-                ClipsDescendants = true,
-            })
-            roundSlice(Pick)
-            
-            create("TextLabel", {
-                Parent = Pick,
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 7, 0, 0),
-                Size = UDim2.new(0, 125, 0, 30),
-                Font = Enum.Font.SourceSansSemibold,
-                Text = name,
-                TextColor3 = Theme.Text,
-                TextSize = 16,
-                TextXAlignment = Enum.TextXAlignment.Left,
-            })
-            
-            local Swatch = create("ImageButton", {
-                Parent = Pick,
-                BackgroundColor3 = defaultColor,
-                BorderSizePixel = 0,
-                Position = UDim2.new(1, -47, 0, 5),
-                Size = UDim2.new(0, 40, 0, 22),
-                AutoButtonColor = false,
-            })
-            create("UICorner", { Parent = Swatch, CornerRadius = UDim.new(0, 3) })
-            
-            -- picker body (hidden until open)
-            local Body = create("Frame", {
-                Parent = Pick,
-                BackgroundColor3 = Color3.fromRGB(30, 30, 30),
-                BorderSizePixel = 0,
-                Position = UDim2.new(0, 5, 0, 36),
-                Size = UDim2.new(1, -10, 0, 120),
-                Visible = false,
-            })
-            create("UICorner", { Parent = Body, CornerRadius = UDim.new(0, 4) })
-            
-            local SatVal = create("ImageLabel", {
-                Parent = Body,
-                Position = UDim2.new(0, 5, 0, 5),
-                Size = UDim2.new(1, -30, 1, -10),
-                BackgroundColor3 = defaultColor,
-                BorderSizePixel = 0,
-                Image = "rbxassetid://4921705601",
-            })
-            local Darkness = create("ImageLabel", {
-                Parent = SatVal,
-                Size = UDim2.new(1, 0, 1, 0),
-                BackgroundTransparency = 1,
-                Image = "rbxassetid://4921703899",
-                ImageColor3 = Color3.new(0, 0, 0),
-            })
-            
-            local Hue = create("Frame", {
-                Parent = Body,
-                Position = UDim2.new(1, -20, 0, 5),
-                Size = UDim2.new(0, 15, 1, -10),
-                BorderSizePixel = 0,
-            })
-            local HueGrad = create("UIGradient", {
-                Parent = Hue,
-                Rotation = 90,
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromHSV(0, 1, 1)),
-                    ColorSequenceKeypoint.new(0.17, Color3.fromHSV(0.17, 1, 1)),
-                    ColorSequenceKeypoint.new(0.33, Color3.fromHSV(0.33, 1, 1)),
-                    ColorSequenceKeypoint.new(0.5, Color3.fromHSV(0.5, 1, 1)),
-                    ColorSequenceKeypoint.new(0.67, Color3.fromHSV(0.67, 1, 1)),
-                    ColorSequenceKeypoint.new(0.83, Color3.fromHSV(0.83, 1, 1)),
-                    ColorSequenceKeypoint.new(1, Color3.fromHSV(1, 1, 1)),
-                }),
-            })
-            
-            local h, s, v = 0, 1, 1
-            local function refresh()
-                local c = Color3.fromHSV(h, s, v)
-                Swatch.BackgroundColor3 = c
-                SatVal.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
-                pcall(callback, c)
-            end
-            
-            local satDrag, hueDrag = false, false
-            SatVal.InputBegan:Connect(function(i)
-                if i.UserInputType == Enum.UserInputType.MouseButton1 then satDrag = true end
-            end)
-            Hue.InputBegan:Connect(function(i)
-                if i.UserInputType == Enum.UserInputType.MouseButton1 then hueDrag = true end
-            end)
-            UserInputService.InputEnded:Connect(function(i)
-                if i.UserInputType == Enum.UserInputType.MouseButton1 then satDrag, hueDrag = false, false end
-            end)
-            RunService.RenderStepped:Connect(function()
-                if satDrag then
-                    s = math.clamp((Mouse.X - SatVal.AbsolutePosition.X) / SatVal.AbsoluteSize.X, 0, 1)
-                    v = 1 - math.clamp((Mouse.Y - SatVal.AbsolutePosition.Y) / SatVal.AbsoluteSize.Y, 0, 1)
-                    refresh()
-                end
-                if hueDrag then
-                    h = math.clamp((Mouse.Y - Hue.AbsolutePosition.Y) / Hue.AbsoluteSize.Y, 0, 1)
-                    refresh()
-                end
-            end)
-            
-            local open = false
-            Swatch.MouseButton1Click:Connect(function()
-                open = not open
-                Body.Visible = open
-                if open then
-                    tween(Pick, 0.2, { Size = UDim2.new(1, -6, 0, 160) })
-                else
-                    tween(Pick, 0.2, { Size = UDim2.new(1, -6, 0, 32) })
-                end
-            end)
-            
-            return Pick
-        end
-        
-        -------------------------------------------
-        -- TextBox
-        -------------------------------------------
         function TabAPI:NewTextBox(name, _info, callback)
             callback = callback or function() end
             local Box = create("ImageLabel", {
@@ -862,9 +663,6 @@ function Library.CreateLib(title, theme)
             return Box
         end
         
-        -------------------------------------------
-        -- Label
-        -------------------------------------------
         function TabAPI:NewLabel(text)
             local Lbl = create("ImageLabel", {
                 Name = "Label",
@@ -877,7 +675,7 @@ function Library.CreateLib(title, theme)
             })
             roundSlice(Lbl)
             
-            local LblText = create("TextLabel", {
+            create("TextLabel", {
                 Parent = Lbl,
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 1, 0),
@@ -887,9 +685,7 @@ function Library.CreateLib(title, theme)
                 TextSize = 16,
             })
             
-            return {
-                UpdateLabel = function(_, newText) LblText.Text = newText end,
-            }
+            return Lbl
         end
         
         return TabAPI
