@@ -171,7 +171,7 @@ function Library.CreateLib(title, theme)
             Name = "Folder",
             Parent = Tabs,
             BackgroundTransparency = 1,
-            ClipsDescendants = true,
+            ClipsDescendants = false,
             Size = UDim2.new(0, 180, 0, 35),
         })
         
@@ -182,6 +182,7 @@ function Library.CreateLib(title, theme)
             Size = UDim2.new(0, 180, 0, 35),
             Image = "rbxassetid://4641600283",
             ImageColor3 = Theme.Secondary,
+            ClipsDescendants = false,
         })
         roundSlice(TabHeader)
         
@@ -218,16 +219,17 @@ function Library.CreateLib(title, theme)
             Size = UDim2.new(1, 0, 0, 0),
             CanvasSize = UDim2.new(0, 0, 0, 0),
             ScrollBarThickness = 2,
+            ClipsDescendants = false,
         })
         local ContentLayout = create("UIListLayout", {
             Parent = TabContent,
             SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDim.new(0, 3),
+            Padding = UDim.new(0, 5),
         })
-        create("UIPadding", { Parent = TabContent, PaddingTop = UDim.new(0, 3) })
+        create("UIPadding", { Parent = TabContent, PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 5) })
 
         ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            TabContent.CanvasSize = UDim2.new(0, 0, 0, ContentLayout.AbsoluteContentSize.Y + 10)
+            TabContent.CanvasSize = UDim2.new(0, 0, 0, ContentLayout.AbsoluteContentSize.Y + 15)
         end)
         
         local HeaderButton = create("TextButton", {
@@ -241,8 +243,8 @@ function Library.CreateLib(title, theme)
         local open = false
         HeaderButton.MouseButton1Click:Connect(function()
             open = not open
-            local contentHeight = ContentLayout.AbsoluteContentSize.Y + 10
-            if contentHeight < 45 then contentHeight = 220 end
+            local contentHeight = ContentLayout.AbsoluteContentSize.Y + 20
+            if contentHeight < 45 then contentHeight = 240 end
             
             if open then
                 local target = contentHeight + 35
@@ -533,7 +535,8 @@ function Library.CreateLib(title, theme)
                 Size = UDim2.new(1, -6, 0, 32),
                 Image = "rbxassetid://4641600283",
                 ImageColor3 = Theme.Tertiary,
-                ClipsDescendants = true,
+                ClipsDescendants = false,
+                ZIndex = 5,
                 LayoutOrder = 1,
             })
             roundSlice(Drop)
@@ -547,6 +550,7 @@ function Library.CreateLib(title, theme)
                 TextColor3 = Theme.Text,
                 TextSize = 16,
                 TextXAlignment = Enum.TextXAlignment.Left,
+                ZIndex = 6,
             })
             
             local DropArrow = create("ImageLabel", {
@@ -558,13 +562,17 @@ function Library.CreateLib(title, theme)
                 Image = "rbxassetid://4921527706",
                 ImageColor3 = Theme.Arrow,
                 Rotation = 0,
+                ZIndex = 6,
             })
             
             local List = create("Frame", {
                 Parent = Drop,
-                BackgroundTransparency = 1,
+                BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+                BorderSizePixel = 0,
                 Position = UDim2.new(0, 0, 0, 32),
                 Size = UDim2.new(1, 0, 0, 0),
+                ClipsDescendants = true,
+                ZIndex = 10,
             })
             create("UIListLayout", { Parent = List, SortOrder = Enum.SortOrder.LayoutOrder })
             
@@ -577,16 +585,20 @@ function Library.CreateLib(title, theme)
                         Parent = List,
                         BackgroundColor3 = Color3.fromRGB(50, 50, 50),
                         BorderSizePixel = 0,
-                        Size = UDim2.new(1, 0, 0, 22),
+                        Size = UDim2.new(1, 0, 0, 24),
                         Font = Enum.Font.SourceSans,
                         Text = tostring(opt),
                         TextColor3 = Theme.Text,
                         TextSize = 14,
+                        ZIndex = 11,
                         LayoutOrder = i,
                     })
                     Item.MouseButton1Click:Connect(function()
                         DropHeader.Text = "  " .. tostring(opt)
                         pcall(callback, opt)
+                        -- close dropdown on selection
+                        tween(List, 0.15, { Size = UDim2.new(1, 0, 0, 0) })
+                        tween(DropArrow, 0.15, { Rotation = 0 })
                     end)
                 end
             end
@@ -596,11 +608,11 @@ function Library.CreateLib(title, theme)
             DropHeader.MouseButton1Click:Connect(function()
                 dropOpen = not dropOpen
                 if dropOpen then
-                    local h = #options * 22 + 34
-                    tween(Drop, 0.2, { Size = UDim2.new(1, -6, 0, h) })
+                    local h = #options * 24
+                    tween(List, 0.2, { Size = UDim2.new(1, 0, 0, h) })
                     tween(DropArrow, 0.2, { Rotation = -90 })
                 else
-                    tween(Drop, 0.2, { Size = UDim2.new(1, -6, 0, 32) })
+                    tween(List, 0.2, { Size = UDim2.new(1, 0, 0, 0) })
                     tween(DropArrow, 0.2, { Rotation = 0 })
                 end
             end)
